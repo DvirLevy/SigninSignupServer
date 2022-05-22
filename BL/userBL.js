@@ -73,7 +73,7 @@ exports.changePassword = async (userDetails) =>{
         const updateResult = await User.findOneAndUpdate({email : userDetails.email},{password : userDetails.newPassword},
             {new : true})
         if(updateResult != null)
-            return {msg : "success", _id : updateResult._id, resut: true}
+            return {msg : "success", _id : updateResult._id, result: true}
         else
             return {msg : "not found", result : false}
     }

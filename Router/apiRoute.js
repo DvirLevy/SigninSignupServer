@@ -50,10 +50,14 @@ router.route("/ResetPassword").post( async (req , res) =>{
 
 router.route("/ChangePassword").post(async (req,res) =>{
     try{
-        await userBL.changePassword(req.body) 
+        const updated = await userBL.changePassword(req.body)
+        if (updated.result)
+            res.status(200).json({msg : updated.msg})
+        else
+            res.status(400).json({msg : updated.msg})
     }
     catch(error){
-        res.status(400).json({msg : error})
+        res.status(500).json({msg : error})
     }
 })
 
