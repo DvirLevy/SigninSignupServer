@@ -22,11 +22,12 @@ router.route("/signup").post( async (req , res) =>{
 
 router.route("/signin").post( async (req , res) =>{
     try{
-        const emailExist = userBL.isUser(req.body) 
-        if(emailExist)
-            res.status(200).json(verifyPass._id)
+        const verified = await userBL.isUser(req.body) 
+        console.log(verified)
+        if(verified.result)
+            res.status(200).json(verified)
         else
-            res.status(401).send("wrong email or password")
+            res.status(401).json(verified)
 
     }
     catch(error){
@@ -37,6 +38,8 @@ router.route("/signin").post( async (req , res) =>{
 
 router.route("/ResetPassword").post( async (req , res) =>{
     try{
+        
+
         await userBL.userExist(req.body) ?
         res.status(200).json({msg : "user exist", email : req.body.email}) :
         res.status(404).json({msg : "user not found"})
@@ -52,12 +55,12 @@ router.route("/ChangePassword").post(async (req,res) =>{
     try{
         const updated = await userBL.changePassword(req.body)
         if (updated.result)
-            res.status(200).json({msg : updated.msg})
+            res.status(200).json(updated)
         else
-            res.status(400).json({msg : updated.msg})
+            res.status(400).json(updated.msg)
     }
     catch(error){
-        res.status(500).json({msg : error})
+        res.status(500).json(error.message)
     }
 })
 
