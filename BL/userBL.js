@@ -1,5 +1,6 @@
 const User = require('../Models/User')
 const { use } = require('../Router/apiRoute')
+const passwordGenerator = require('../Services/passwordGenerator')
 exports.createUser = async (userDetails) =>{
     try{
         const user = new User({
@@ -81,6 +82,26 @@ exports.changePassword = async (userDetails) =>{
         else{
             return {msg : "something went wrong", result : false}
         }
+    }
+    catch(error){
+        return error
+    }
+    
+
+}
+
+exports.resetPassword = async (userDetails) =>{
+    
+    try{
+        if (await this.userExist(userDetails)){
+            const newGeneratedPassword = passwordGenerator.passwordGenerator()
+            const updateResult = await User.findOneAndUpdate({email : userDetails.email},{password : newGeneratedPassword},
+                {new : true})
+            console.log(updateResult)
+            return updateResult
+        }
+        else
+            return {msg : "user not found", result : false}
     }
     catch(error){
         return error

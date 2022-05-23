@@ -40,8 +40,8 @@ router.route("/ResetPassword").post( async (req , res) =>{
     try{
         
 
-        await userBL.userExist(req.body) ?
-        res.status(200).json({msg : "user exist", email : req.body.email}) :
+        await userBL.resetPassword(req.body) ?
+        res.status(200).json({msg : "new password sent", email : req.body.email}) :
         res.status(404).json({msg : "user not found"})
     }
     catch(error){
