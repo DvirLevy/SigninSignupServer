@@ -1,6 +1,7 @@
 const User = require('../Models/User')
 const { use } = require('../Router/apiRoute')
 const passwordGenerator = require('../Services/passwordGenerator')
+const mailer = require('../Services/mailer')
 exports.createUser = async (userDetails) =>{
     try{
         const user = new User({
@@ -98,10 +99,14 @@ exports.resetPassword = async (userDetails) =>{
             const updateResult = await User.findOneAndUpdate({email : userDetails.email},{password : newGeneratedPassword},
                 {new : true})
             console.log(updateResult)
+            const result = await mailer.sendMail(updateResult.email, updateResult.password, updateResult.first_name)
+            console.log(result)
             return updateResult
         }
-        else
-            return {msg : "user not found", result : false}
+        else{
+            const resp = {msg : "user not found", result : false}
+            return resp
+        }
     }
     catch(error){
         return error
