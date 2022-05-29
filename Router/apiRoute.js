@@ -3,40 +3,12 @@ const express = require("express")
 const router = express.Router()
 const User = require('../Models/User')
 const userBL = require('../BL/userBL')
+const { createAuth } = require("../Services/auth")
 
 
+const app = express()
 
-router.route("/signup").post( async (req , res) =>{
-    try{
-        const newUser = await userBL.createUser(req.body)
-        if(!newUser._id)
-            res.status(500).send("something went wrong...")
-        else
-            res.status(201).json(newUser)
-    }
-    catch(error){
-        res.status(400).send(error)
-    }
-
-})
-
-router.route("/signin").post( async (req , res) =>{
-    try{
-        const verified = await userBL.isUser(req.body) 
-        console.log(verified)
-        if(verified.result)
-            res.status(200).json(verified)
-        else
-            res.status(401).json(verified)
-
-    }
-    catch(error){
-        res.status(500).json({msg : error.message})
-    }
-
-})
-
-router.route("/ResetPassword").post( async (req , res) =>{
+router.route("/resetPassword").post( async (req , res) =>{
     try{
         
 
@@ -51,7 +23,7 @@ router.route("/ResetPassword").post( async (req , res) =>{
 })
 
 
-router.route("/ChangePassword").post(async (req,res) =>{
+router.route("/changePassword").post(async (req,res) =>{
     try{
         const updated = await userBL.changePassword(req.body)
         if (updated.result)
@@ -63,5 +35,48 @@ router.route("/ChangePassword").post(async (req,res) =>{
         res.status(500).json(error.message)
     }
 })
+
+
+
+
+
+
+router.route("/signup").post( async (req , res) =>{
+    try{
+        const newUser = await userBL.createUser(req.body)
+        if(!newUser._id)
+            res.status(500).send("something went wrong...")
+        else{
+            const accessToken = await createAuth(newUser)
+            res.status(201).json({token : accessToken})
+        }
+    }
+    catch(error){
+        res.status(400).send(error)
+    }
+
+})
+
+router.route("/signin").post( async (req , res) =>{
+    try{
+        const verified = await userBL.isUser(req.body) 
+        console.log(verified)
+        if(verified.result){
+            verified.token = await createAuth(verified.user_id)
+            res.status(200).json(verified)
+        }
+        else
+            res.status(401).json(verified)
+
+    }
+    catch(error){
+        res.status(500).json({msg : error.message})
+    }
+
+})
+
+
+
+
 
 module.exports = router
