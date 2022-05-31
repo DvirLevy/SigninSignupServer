@@ -4,6 +4,7 @@ const router = express.Router()
 const User = require('../Models/User')
 const userBL = require('../BL/userBL')
 const { createAuth } = require("../Services/auth")
+const { verifyHashedPassword } = require("../Services/passwordHandler")
 
 
 const app = express()
@@ -11,8 +12,8 @@ const app = express()
 router.route("/resetPassword").post( async (req , res) =>{
     try{
         
-
-        await userBL.resetPassword(req.body) ?
+        const r = await userBL.resetPassword(req.body) 
+        r.result  ?
         res.status(200).json({msg : "new password sent", email : req.body.email}) :
         res.status(404).json({msg : "user not found"})
     }
@@ -44,11 +45,13 @@ router.route("/changePassword").post(async (req,res) =>{
 router.route("/signup").post( async (req , res) =>{
     try{
         const newUser = await userBL.createUser(req.body)
-        if(!newUser._id)
-            res.status(500).send("something went wrong...")
+        // console.log(typeof(newUser)) 
+        if(typeof(newUser) != 'object')
+            res.status(400).send({msg : newUser})
         else{
             const accessToken = await createAuth(newUser)
-            res.status(201).json({token : accessToken})
+            console.log("from signup >>>"+accessToken)
+            res.status(201).json({token : accessToken, result : true})
         }
     }
     catch(error){
@@ -62,6 +65,8 @@ router.route("/signin").post( async (req , res) =>{
         const verified = await userBL.isUser(req.body) 
         console.log(verified)
         if(verified.result){
+            // const h = await verifyHashedPassword(req.body.password, verified.password)
+            // console.log(h) 
             verified.token = await createAuth(verified.user_id)
             res.status(200).json(verified)
         }

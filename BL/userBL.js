@@ -2,13 +2,18 @@ const User = require('../Models/User')
 const { use } = require('../Router/apiRoute')
 const passwordGenerator = require('../Services/passwordGenerator')
 const mailer = require('../Services/mailer')
+const { hashPassword, verifyHashedPassword } = require('../Services/passwordHandler')
 exports.createUser = async (userDetails) =>{
     try{
+
+        const hashedPassword =  await hashPassword(userDetails.password)
+        console.log("hashPassword >>>  "+hashedPassword)
+
         const user = new User({
             first_name : userDetails.firstName,
             last_name : userDetails.lastName,
             email : userDetails.email,
-            password : userDetails.password,
+            password : hashedPassword,
             allow_promotions : userDetails.allowPromotions
         })
         const savedUser = await user.save()
@@ -19,7 +24,7 @@ exports.createUser = async (userDetails) =>{
             return savedUser._id
     }
     catch(error){
-        return error
+        return error._message
     }
     
 }
@@ -31,12 +36,12 @@ exports.isUser = async (userDetails) => {
         const findUserEmail = await User.findOne({
             email : userDetails.email
         })
+        console.log(findUserEmail)
         
         if(findUserEmail){
-            const verifyPass = await User.findOne({password: userDetails.password})
-            
-            if(verifyPass)
-                return {msg: "success", result : true, user_id : verifyPass._id }
+            const verifyPassword = await verifyHashedPassword(userDetails.password, findUserEmail.password)
+            if(verifyPassword)
+                return {msg: "success", result : true, user_id : findUserEmail._id }
             else
                 return {msg : "wrong email or password", result : false}
         }
@@ -52,7 +57,8 @@ exports.isUser = async (userDetails) => {
 exports.userExist = async (userDetails) =>{
     try{
         emailExist = await User.findOne({email : userDetails.email})
-        if(emailExist)
+        console.log(emailExist)
+        if(emailExist != null)
             return true
         else
             return false
@@ -94,12 +100,14 @@ exports.changePassword = async (userDetails) =>{
 exports.resetPassword = async (userDetails) =>{
     
     try{
-        if (await this.userExist(userDetails)){
+        const r = await await this.userExist(userDetails)
+        if (r != null){
             const newGeneratedPassword = passwordGenerator.passwordGenerator()
-            const updateResult = await User.findOneAndUpdate({email : userDetails.email},{password : newGeneratedPassword},
+            const updateResult = await User.findOneAndUpdate({email : userDetails.email},
+                {password : await hashPassword(newGeneratedPassword)},
                 {new : true})
             console.log(updateResult)
-            const result = await mailer.sendMail(updateResult.email, updateResult.password, updateResult.first_name)
+            const result = await mailer.sendMail(updateResult.email, newGeneratedPassword, updateResult.first_name)
             console.log(result)
             return updateResult
         }
@@ -109,7 +117,7 @@ exports.resetPassword = async (userDetails) =>{
         }
     }
     catch(error){
-        return error
+        return {msg : error.message , result : false}
     }
     
 

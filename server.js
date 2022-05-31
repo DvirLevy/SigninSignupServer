@@ -13,6 +13,10 @@ require('./config/database')
 app.use(express.json())
 app.use(express.urlencoded({extended : true}))
 
+app.use((req,res,next)=>{
+    res.setHeader("Content-Type" , "application/jsonx")
+    next()
+})
 
 app.use('/api', apiRoute)
 app.use('/api/auth', isAuthenticated, apiAuthRoute)

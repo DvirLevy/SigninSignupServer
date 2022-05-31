@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 const userSchema = new mongoose.Schema({
     first_name : {
         type : String,
-        required : true,
+        required : [true, "First name is required"], 
         min : 2
     },
     last_name : {
