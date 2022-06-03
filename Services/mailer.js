@@ -18,7 +18,7 @@ exports.sendMail = async (mailReceiver, generatedPassword, firstName) => {
             text: `Hi ${firstName} that is your new password >> ${generatedPassword}`, 
         });
 
-        transporter.sendMail(option, (err,info) =>{
+        return transporter.sendMail(option, (err,info) =>{
             if(err)
                 return err
             else

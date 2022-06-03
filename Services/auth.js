@@ -10,7 +10,6 @@ exports.createAuth = async (user_id)=>{
                 if(err)
                     reject(err)
                 else{
-                    console.log(token)
                     resolve(token)
                 }
             }

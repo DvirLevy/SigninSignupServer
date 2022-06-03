@@ -1,5 +1,4 @@
 const bcrypt = require('bcryptjs')
-const res = require('express/lib/response')
 
 const SALT = 10
 
@@ -9,7 +8,7 @@ exports.hashPassword = (pass) =>{
             if(err)
                 reject(err)
             else{
-                console.log(hash)
+                
                 resovle(hash)
             }
         })

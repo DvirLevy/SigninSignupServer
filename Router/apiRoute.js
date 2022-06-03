@@ -12,13 +12,13 @@ const app = express()
 router.route("/resetPassword").post( async (req , res) =>{
     try{
         
-        const r = await userBL.resetPassword(req.body) 
-        r.result  ?
+        const resp = await userBL.resetPassword(req.body) 
+        resp !== null  ?
         res.status(200).json({msg : "new password sent", email : req.body.email}) :
-        res.status(404).json({msg : "user not found"})
+        res.status(404).json({msg : r.msg ,result: r.result})
     }
     catch(error){
-        res.status(500).send(error)
+        res.status(500).send({msg : error.message})
     }
 
 })
