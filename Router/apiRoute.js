@@ -65,8 +65,6 @@ router.route("/signin").post( async (req , res) =>{
         const verified = await userBL.isUser(req.body) 
         console.log(verified)
         if(verified.result){
-            // const h = await verifyHashedPassword(req.body.password, verified.password)
-            // console.log(h) 
             verified.token = await createAuth(verified.user_id)
             res.status(200).json(verified)
         }
@@ -80,6 +78,19 @@ router.route("/signin").post( async (req , res) =>{
 
 })
 
+router.route("/checkEmail").post( async (req , res) =>{
+    try{
+        const user = await userBL.userExist(req.body)
+        console.log('from emailCheck '+user);
+        user ? res.status(409).json({msg : "user already exist", result: true}) :
+        res.status(200).json({msg: "success", result : false})
+
+    }
+    catch(error){
+        res.status(500).json({msg : error.message})
+    }
+
+})
 
 
 

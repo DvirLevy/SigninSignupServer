@@ -65,7 +65,7 @@ exports.userExist = async (userDetails) =>{
 
     }
     catch(error){
-        return error
+        return error.message
     }
     
 
