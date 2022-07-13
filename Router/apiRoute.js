@@ -45,13 +45,12 @@ router.route("/changePassword").post(async (req,res) =>{
 router.route("/signup").post( async (req , res) =>{
     try{
         const newUser = await userBL.createUser(req.body)
-        // console.log(typeof(newUser)) 
         if(typeof(newUser) != 'object')
             res.status(400).send({msg : newUser})
         else{
             const accessToken = await createAuth(newUser)
             console.log("from signup >>>"+accessToken)
-            res.status(201).json({token : accessToken, result : true})
+            res.status(201).json({token : accessToken, result : true, user_id: newUser})
         }
     }
     catch(error){
@@ -80,11 +79,11 @@ router.route("/signin").post( async (req , res) =>{
 
 router.route("/checkEmail").post( async (req , res) =>{
     try{
-        const user = await userBL.userExist(req.body)
-        console.log('from emailCheck '+user);
-        user ? res.status(409).json({msg : "user already exist", result: true}) :
-        res.status(200).json({msg: "success", result : false})
-
+        const mailExist = await userBL.userExist(req.body)
+        console.log('from emailCheck '+mailExist);
+        mailExist ? res.status(409).json({msg : "user already exist", result: true}) :
+        res.status(200).json({msg: "success", result : false}) 
+        
     }
     catch(error){
         res.status(500).json({msg : error.message})

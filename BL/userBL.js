@@ -7,7 +7,6 @@ exports.createUser = async (userDetails) =>{
     try{
 
         const hashedPassword =  await hashPassword(userDetails.password)
-        console.log("hashPassword >>>  "+hashedPassword)
 
         const user = new User({
             first_name : userDetails.firstName,
@@ -57,11 +56,11 @@ exports.isUser = async (userDetails) => {
 exports.userExist = async (userDetails) =>{
     try{
         emailExist = await User.findOne({email : userDetails.email})
-        
-        if(emailExist != null)
-            return true
-        else
+        console.log(emailExist)
+        if(emailExist == null)
             return false
+        else
+            return true
 
     }
     catch(error){
@@ -112,6 +111,7 @@ exports.resetPassword = async (userDetails) =>{
         }
         else{
             return {msg : "user not found", result : false}
+            
             
         }
     }
