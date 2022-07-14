@@ -78,7 +78,7 @@ exports.changePassword = async (userDetails) =>{
 
         //2. update the pass
         if(verifiedUser.result){
-            const updateResult = await User.findOneAndUpdate({email : userDetails.email},{password : userDetails.newPassword},
+            const updateResult = await User.findOneAndUpdate({email : userDetails.email},{password : hashPassword(userDetails.newPassword)},
                 {new : true})
             if(updateResult != null)
                 return {msg : "success", _id : updateResult._id, result: true}
