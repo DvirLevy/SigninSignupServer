@@ -35,12 +35,15 @@ exports.isUser = async (userDetails) => {
         const findUserEmail = await User.findOne({
             email : userDetails.email
         })
-        console.log(findUserEmail)
+        console.log(findUserEmail+"\n"+ `${+Date.now()}`)
         
         if(findUserEmail){
             const verifyPassword = await verifyHashedPassword(userDetails.password, findUserEmail.password)
-            if(verifyPassword)
+            if(verifyPassword){
+                // User.findByIdAndUpdate({email : userDetails.email} , {lastLogin : +Date.now})
                 return {msg: "success", result : true, user_id : findUserEmail._id }
+            }
+                
             else
                 return {msg : "wrong email or password", result : false}
         }
@@ -74,12 +77,15 @@ exports.changePassword = async (userDetails) =>{
     
     try{
         //1. check if he is a user with isUser again
-        const verifiedUser = await this.isUser(userDetails)
+        const verifiedUser = await this.userExist(userDetails)
 
         //2. update the pass
-        if(verifiedUser.result){
-            const updateResult = await User.findOneAndUpdate({email : userDetails.email},{password : hashPassword(userDetails.newPassword)},
+        if(verifiedUser){
+            const newPwd = await hashPassword(userDetails.newPassword)
+            console.log("pwd changed " + userDetails.newPassword)
+            const updateResult = await User.findOneAndUpdate({email : userDetails.email},{password : newPwd},
                 {new : true})
+            
             if(updateResult != null)
                 return {msg : "success", _id : updateResult._id, result: true}
             else
@@ -102,9 +108,10 @@ exports.resetPassword = async (userDetails) =>{
         const dbResponse = await this.userExist(userDetails)
         if (dbResponse != null){
             const newGeneratedPassword = passwordGenerator.passwordGenerator()
-            const hashedNewPwd = await hashPassword(newGeneratedPassword)
+            const hashedGenNewPwd = await hashPassword(newGeneratedPassword)
+            console.log("resetPwd" + ` ${newGeneratedPassword}`)
             const updateResult = await User.findOneAndUpdate({email : userDetails.email},
-                {password : hashedNewPwd},
+                {password : hashedGenNewPwd},
                 {new : true})
             await mailer.sendMail(updateResult.email, newGeneratedPassword, updateResult.first_name)
             return updateResult
