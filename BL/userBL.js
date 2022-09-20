@@ -44,7 +44,6 @@ exports.isUser = async (userDetails) => {
                 const timestamp = await +Date.now()
                 
                await User.findByIdAndUpdate({_id : findUserEmail._id} , {last_login : timestamp}, {new : true} )
-                // User.findOne({_id : userDetails.id})
                 return {msg: "success", result : true, user_id : findUserEmail._id }
             }
                 
