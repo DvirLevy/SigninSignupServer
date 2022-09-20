@@ -15,7 +15,7 @@ router.route("/resetPassword").post( async (req , res) =>{
         const resp = await userBL.resetPassword(req.body) 
         resp !== null  ?
         res.status(200).json({msg : "new password sent", email : req.body.email}) :
-        res.status(404).json({msg : r.msg ,result: r.result})
+        res.status(404).json({msg : resp.msg ,result: resp.result})
     }
     catch(error){
         res.status(500).send({msg : error.message})

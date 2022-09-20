@@ -13,7 +13,8 @@ exports.createUser = async (userDetails) =>{
             last_name : userDetails.lastName,
             email : userDetails.email,
             password : hashedPassword,
-            allow_promotions : userDetails.allowPromotions
+            allow_promotions : userDetails.allowPromotions,
+            last_login : +Date.now()
         })
         const savedUser = await user.save()
         
@@ -35,12 +36,15 @@ exports.isUser = async (userDetails) => {
         const findUserEmail = await User.findOne({
             email : userDetails.email
         })
-        console.log(findUserEmail+"\n"+ `${+Date.now()}`)
-        
+    
+        console.log(findUserEmail)
         if(findUserEmail){
             const verifyPassword = await verifyHashedPassword(userDetails.password, findUserEmail.password)
             if(verifyPassword){
-                // User.findByIdAndUpdate({email : userDetails.email} , {lastLogin : +Date.now})
+                const timestamp = await +Date.now()
+                
+               await User.findByIdAndUpdate({_id : findUserEmail._id} , {last_login : timestamp}, {new : true} )
+                // User.findOne({_id : userDetails.id})
                 return {msg: "success", result : true, user_id : findUserEmail._id }
             }
                 
@@ -84,7 +88,7 @@ exports.changePassword = async (userDetails) =>{
             const newPwd = await hashPassword(userDetails.newPassword)
             console.log("pwd changed " + userDetails.newPassword)
             const updateResult = await User.findOneAndUpdate({email : userDetails.email},{password : newPwd},
-                {new : true})
+                {new : true}) 
             
             if(updateResult != null)
                 return {msg : "success", _id : updateResult._id, result: true}

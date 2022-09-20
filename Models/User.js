@@ -29,6 +29,11 @@ const userSchema = new mongoose.Schema({
     date :{
         type : Date,
         default : Date.now
+    }, 
+
+    last_login : {
+        type : Number,
+        required : false
     }
     
 })
