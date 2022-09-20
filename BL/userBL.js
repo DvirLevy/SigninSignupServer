@@ -41,7 +41,7 @@ exports.isUser = async (userDetails) => {
         if(findUserEmail){
             const verifyPassword = await verifyHashedPassword(userDetails.password, findUserEmail.password)
             if(verifyPassword){
-                const timestamp = await +Date.now()
+                const timestamp = await Date.now()
                 
                await User.findByIdAndUpdate({_id : findUserEmail._id} , {last_login : timestamp}, {new : true} )
                 return {msg: "success", result : true, user_id : findUserEmail._id }
