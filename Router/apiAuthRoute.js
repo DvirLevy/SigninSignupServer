@@ -27,6 +27,16 @@ router.route("/main").get(async (req,res) =>{
     }
 })
 
+router.route("/test").get(async (req,res) =>{ 
+    try{
+        
+        res.status(200).json(req.headers)
+    }
+    catch(error){
+        res.status(500).json({error})
+    }
+})
+
 
 
 

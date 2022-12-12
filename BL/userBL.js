@@ -37,7 +37,6 @@ exports.isUser = async (userDetails) => {
             email : userDetails.email
         })
     
-        console.log(findUserEmail)
         if(findUserEmail){
             const verifyPassword = await verifyHashedPassword(userDetails.password, findUserEmail.password)
             if(verifyPassword){
